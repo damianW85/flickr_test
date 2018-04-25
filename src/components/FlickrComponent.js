@@ -4,6 +4,7 @@ import LabeledInput from "../partials/LabeledInput";
 import Button from "../partials/Button";
 import InfiniteScroll from "react-infinite-scroller";
 import PostImage from "../partials/PostImage";
+import { HeaderWrap } from "../partials/StyledElements";
 
 class FlickrComponent extends Component {
   constructor(props) {
@@ -13,7 +14,8 @@ class FlickrComponent extends Component {
       nextPage: 1,
       noMorePages: false,
       totalPages: null,
-      tags: ["street", "london"]
+      tags: ["street", "london"],
+      keywords: ""
     };
   }
 
@@ -41,7 +43,6 @@ class FlickrComponent extends Component {
         return response.json();
       })
       .then(function(data) {
-        console.log(data);
         callBack(data);
       });
   };
@@ -51,7 +52,40 @@ class FlickrComponent extends Component {
       { tags: [...this.searchBox.value.split(" ")], nextPage: 1 },
       () => {
         this.getItems(this.addItems, false);
+        this.searchBox.value = "";
       }
+    );
+  };
+
+  removePhoto = elementId => {
+    this.setState({
+      photos: [...this.state.photos.filter(post => post.photo.id !== elementId)]
+    });
+  };
+
+  filterPhotos = () => {
+    this.setState(
+      {
+        keywords: this.filterBox.value.toLowerCase(),
+        photos: [
+          ...this.state.photos.filter(
+            post =>
+              post.photo.description._content
+                .toLowerCase()
+                .indexOf(this.filterBox.value.toLowerCase()) !== -1 ||
+              post.photo.title._content
+                .toLowerCase()
+                .indexOf(this.filterBox.value.toLowerCase()) !== -1 ||
+              post.photo.owner.username
+                .toLowerCase()
+                .indexOf(this.filterBox.value.toLowerCase()) !== -1
+          )
+        ]
+      },
+      () =>
+        this.state.photos.length < 10
+          ? this.getItems(this.addItems, true)
+          : null
     );
   };
 
@@ -62,13 +96,30 @@ class FlickrComponent extends Component {
   render() {
     return this.state.photos.length ? (
       <div>
-        <LabeledInput
-          innerRef={searchBox => (this.searchBox = searchBox)}
-          name="tags_search"
-          placeholder={`current tags: ${this.state.tags}`}
-          label="search tags (seperated by space)"
-        />
-        <Button text="Search" callBack={this.searchNewTags} />
+        <HeaderWrap>
+          <LabeledInput
+            innerRef={searchBox => (this.searchBox = searchBox)}
+            name="tags_search"
+            placeholder={`current tags: ${this.state.tags}`}
+            label="Search Tags (seperated by space)"
+          >
+            <Button
+              className="search_button"
+              text="Search"
+              callBack={this.searchNewTags}
+            />
+          </LabeledInput>
+          <LabeledInput
+            onChange={this.filterPhotos}
+            className="filter_input"
+            innerRef={filterBox => (this.filterBox = filterBox)}
+            name="tags_search"
+            placeholder={
+              this.state.keywords.length ? this.state.keywords : "enter keyword"
+            }
+            label="Filter Photos"
+          />
+        </HeaderWrap>
         <InfiniteScroll
           className="scroll_wrapper"
           pageStart={0}
@@ -84,7 +135,11 @@ class FlickrComponent extends Component {
           }
         >
           {this.state.photos.map((post, postIdx) => (
-            <PostTemplate key={post.photo.id} data={post.photo} />
+            <PostTemplate
+              deletePost={this.removePhoto}
+              key={post.photo.id}
+              data={post.photo}
+            />
           ))}
         </InfiniteScroll>
       </div>

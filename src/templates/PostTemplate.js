@@ -1,31 +1,21 @@
-import styled from "styled-components";
 import React from "react";
 import PostImage from "../partials/PostImage";
+import {
+  PostWrapper,
+  TagsWrapper,
+  StyledButton
+} from "../partials/StyledElements";
 
-const PostWrapper = styled.div`
-  position: relative;
-  top: 0px;
-  left: 0px;
-  padding: 15px;
-  margin: 15px 0 0 15px;
-  background-color: #004b64;
-  min-width: 400px;
-  flex: 1;
-`;
-
-const TagsWrapper = styled.div`
-  width: 100%;
-  padding: 15px 0;
-  overflow: hidden;
-`;
-
-const PostTemplate = ({ data }) => {
+const PostTemplate = ({ data, deletePost }) => {
   const description = data.description._content
     .replace(/(<([^>]+)>)/gi, " ")
     .trim();
 
   return (
     <PostWrapper>
+      <StyledButton className="delete" onClick={() => deletePost(data.id)}>
+        x
+      </StyledButton>
       <PostImage
         source={`https://farm${data.farm}.staticflickr.com/${data.server}/${
           data.id
