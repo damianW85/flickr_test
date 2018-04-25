@@ -17,19 +17,16 @@ class FlickrComponent extends Component {
     };
   }
 
-  loadItems = resp => {
+  addItems = (resp, update) => {
+    let photosArray;
+    update
+      ? (photosArray = [...this.state.photos, ...resp.data])
+      : (photosArray = [...resp.data]);
+
     this.setState({
-      photos: [...resp.data],
+      photos: photosArray,
       nextPage: resp.nextPage,
       totalPages: resp.totalPages,
-      noMorePages: resp.nextPage < resp.totalPages
-    });
-  };
-
-  addItems = resp => {
-    this.setState({
-      photos: [...this.state.photos, ...resp.data],
-      nextPage: resp.nextPage,
       noMorePages: resp.nextPage < resp.totalPages
     });
   };
@@ -53,13 +50,13 @@ class FlickrComponent extends Component {
     this.setState(
       { tags: [...this.searchBox.value.split(" ")], nextPage: 1 },
       () => {
-        this.getItems(this.loadItems);
+        this.getItems(this.addItems, false);
       }
     );
   };
 
   componentDidMount() {
-    this.getItems(this.loadItems);
+    this.getItems(this.addItems, false);
   }
 
   render() {
@@ -75,9 +72,7 @@ class FlickrComponent extends Component {
         <InfiniteScroll
           className="scroll_wrapper"
           pageStart={0}
-          loadMore={() => {
-            this.getItems(this.addItems);
-          }}
+          loadMore={() => this.getItems(data => this.addItems(data, true))}
           hasMore={this.state.noMorePages}
           threshold={300}
           loader={
