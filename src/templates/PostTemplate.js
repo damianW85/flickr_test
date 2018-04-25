@@ -3,13 +3,14 @@ import React from "react";
 import PostImage from "../partials/PostImage";
 
 const PostWrapper = styled.div`
-  position: absolute;
+  position: relative;
   top: 0px;
   left: 0px;
   padding: 15px;
-  margin: 15px;
+  margin: 15px 0 0 15px;
   background-color: #004b64;
-  width: 400px;
+  min-width: 400px;
+  flex: 1;
 `;
 
 const TagsWrapper = styled.div`
@@ -19,6 +20,10 @@ const TagsWrapper = styled.div`
 `;
 
 const PostTemplate = ({ data }) => {
+  const description = data.description._content
+    .replace(/(<([^>]+)>)/gi, " ")
+    .trim();
+
   return (
     <PostWrapper>
       <PostImage
@@ -33,7 +38,7 @@ const PostTemplate = ({ data }) => {
         >
           {data.title._content}
         </a>{" "}
-        By{" "}
+        By:{" "}
         <a
           target="_blank"
           href={`https://www.flickr.com/photos/${data.owner.nsid}`}
@@ -41,7 +46,7 @@ const PostTemplate = ({ data }) => {
           {data.owner.realname || data.owner.nsid}
         </a>{" "}
       </p>
-      <p>{data.description._content}</p>
+      <p>{description}</p>
       <TagsWrapper>
         {data.tags.tag.map(
           (tagObj, idx) =>

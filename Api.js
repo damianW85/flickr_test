@@ -42,10 +42,14 @@ app.get(
         method: "GET",
         url: `https://api.flickr.com/services/rest?per_page=20&viewerNSID=&method=flickr.photos.search&api_key=${
           config.flickrApiKey
-        }&format=json&nojsoncallback=1&tagmode=any&${req.query.q}`
+        }&format=json&nojsoncallback=1&tagmode=any&${req.query.q.replace(
+          "/",
+          "&"
+        )}`
       },
       function(body) {
         const data = JSON.parse(body);
+        responseObj.totalPages = data.photos.pages;
         responseObj.nextPage = data.photos.page + 1;
 
         data.photos.photo.map(function(photo) {

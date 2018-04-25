@@ -10,7 +10,7 @@
     "open": "0.0.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-masonry-infinite": "^1.2.2",
+    "react-infinite-scroller": "^1.1.4",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",
     "react-scripts": "1.1.1",
@@ -34,12 +34,7 @@
     "prettier": "1.12.1"
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --trailing-comma es5 --single-quote --write",
-      "git add"
-    ],
-    "yarn.lock": [
-      "git rm --cached"
-    ]
+    "*.js": ["prettier --trailing-comma es5 --single-quote --write", "git add"],
+    "yarn.lock": ["git rm --cached"]
   }
 }

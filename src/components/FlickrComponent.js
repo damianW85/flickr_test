@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import PostTemplate from "../templates/PostTemplate";
 import LabeledInput from "../partials/LabeledInput";
 import Button from "../partials/Button";
-import MasonryInfiniteScroller from "react-masonry-infinite";
+import InfiniteScroll from "react-infinite-scroller";
+import PostImage from "../partials/PostImage";
 
 class FlickrComponent extends Component {
   constructor(props) {
@@ -10,17 +11,32 @@ class FlickrComponent extends Component {
     this.state = {
       photos: [],
       nextPage: 1,
+      noMorePages: false,
+      totalPages: null,
       tags: ["street", "london"]
     };
   }
 
-  updateItems = resp => {
-    this.setState({ photos: [...resp.data], nextPage: resp.nextPage });
+  loadItems = resp => {
+    this.setState({
+      photos: [...resp.data],
+      nextPage: resp.nextPage,
+      totalPages: resp.totalPages,
+      noMorePages: resp.nextPage < resp.totalPages
+    });
   };
 
-  getItems(callBack) {
+  addItems = resp => {
+    this.setState({
+      photos: [...this.state.photos, ...resp.data],
+      nextPage: resp.nextPage,
+      noMorePages: resp.nextPage < resp.totalPages
+    });
+  };
+
+  getItems = callBack => {
     fetch(
-      `data?q=tags=${this.state.tags.map(tag => `${tag},`)}&page=${
+      `data?q=tags=${this.state.tags.map(tag => `${tag}`)}/page=${
         this.state.nextPage
       }`
     )
@@ -28,21 +44,22 @@ class FlickrComponent extends Component {
         return response.json();
       })
       .then(function(data) {
+        console.log(data);
         callBack(data);
       });
-  }
+  };
 
   searchNewTags = () => {
     this.setState(
       { tags: [...this.searchBox.value.split(" ")], nextPage: 1 },
       () => {
-        this.getItems(this.updateItems);
+        this.getItems(this.loadItems);
       }
     );
   };
 
   componentDidMount() {
-    this.getItems(this.updateItems);
+    this.getItems(this.loadItems);
   }
 
   render() {
@@ -55,25 +72,33 @@ class FlickrComponent extends Component {
           label="search tags (seperated by space)"
         />
         <Button text="Search" callBack={this.searchNewTags} />
-        <MasonryInfiniteScroller
-          className="grid"
-          hasMore={this.state.hasMore}
-          loadMore={() =>
-            this.setState({ elements: this.state.elements.push("Element") })
+        <InfiniteScroll
+          className="scroll_wrapper"
+          pageStart={0}
+          loadMore={() => {
+            this.getItems(this.addItems);
+          }}
+          hasMore={this.state.noMorePages}
+          threshold={300}
+          loader={
+            <PostImage
+              key={this.state.nextPage}
+              className="loader"
+              source="../loading.gif"
+            />
           }
-          sizes={[
-            { columns: 1, gutter: 15 },
-            { mq: "800px", columns: 2, gutter: 15 },
-            { mq: "1024px", columns: 3, gutter: 15 }
-          ]}
         >
           {this.state.photos.map((post, postIdx) => (
             <PostTemplate key={post.photo.id} data={post.photo} />
           ))}
-        </MasonryInfiniteScroller>
+        </InfiniteScroll>
       </div>
     ) : (
-      <h2>Loading...</h2>
+      <PostImage
+        key={this.state.nextPage}
+        className="loader"
+        source="../loading.gif"
+      />
     );
   }
 }
