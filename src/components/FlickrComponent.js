@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import PostTemplate from "../templates/PostTemplate";
+import LabeledInput from "../partials/LabeledInput";
+import Button from "../partials/Button";
 import MasonryInfiniteScroller from "react-masonry-infinite";
 
 class FlickrComponent extends Component {
@@ -30,16 +32,29 @@ class FlickrComponent extends Component {
       });
   }
 
-  reorderItems(data) {}
+  searchNewTags = () => {
+    this.setState(
+      { tags: [...this.searchBox.value.split(" ")], nextPage: 1 },
+      () => {
+        this.getItems(this.updateItems);
+      }
+    );
+  };
 
   componentDidMount() {
     this.getItems(this.updateItems);
   }
 
   render() {
-    console.log(this.state.photos);
     return this.state.photos.length ? (
       <div>
+        <LabeledInput
+          innerRef={searchBox => (this.searchBox = searchBox)}
+          name="tags_search"
+          placeholder={`current tags: ${this.state.tags}`}
+          label="search tags (seperated by space)"
+        />
+        <Button text="Search" callBack={this.searchNewTags} />
         <MasonryInfiniteScroller
           className="grid"
           hasMore={this.state.hasMore}

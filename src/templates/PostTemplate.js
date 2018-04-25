@@ -19,7 +19,6 @@ const TagsWrapper = styled.div`
 `;
 
 const PostTemplate = ({ data }) => {
-  console.log(data)
   return (
     <PostWrapper>
       <PostImage
@@ -35,13 +34,14 @@ const PostTemplate = ({ data }) => {
           {data.title._content}
         </a>{" "}
         By{" "}
-        <a target="_blank" href={`https://www.flickr.com/photos/${data.owner.nsid}`}>
+        <a
+          target="_blank"
+          href={`https://www.flickr.com/photos/${data.owner.nsid}`}
+        >
           {data.owner.realname || data.owner.nsid}
         </a>{" "}
       </p>
-      <p>
-        {data.description._content}
-      </p>
+      <p>{data.description._content}</p>
       <TagsWrapper>
         {data.tags.tag.map(
           (tagObj, idx) =>

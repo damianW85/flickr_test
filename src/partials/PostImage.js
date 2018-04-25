@@ -19,9 +19,9 @@ const ImageBackground = styled.div`
   background-image: linear-gradient(to top, #004b64, rgba(0, 75, 100, 0) 40%), url('${props => props.backgroundSrc? props.backgroundSrc: ''}');
 `;
 
-const PostImage = ({ source }) => {
+const PostImage = ({ source, ...props }) => {
   return (
-    <ImageWrap>
+    <ImageWrap {...props}>
       <ImageBackground backgroundSrc={source} />
     </ImageWrap>
   );
