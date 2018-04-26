@@ -2,6 +2,7 @@
   "name": "oneview_news",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:7000/",
   "dependencies": {
     "express": "^4.16.2",
     "history": "^4.7.2",
