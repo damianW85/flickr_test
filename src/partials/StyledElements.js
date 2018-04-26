@@ -93,6 +93,12 @@ export const ImageWrap = styled.div`
   }
 `;
 
+// const Component = styled.div.attrs({
+//     style: ({ background }) => ({
+//       background,
+//     }),
+//   })`width: 100%;`
+
 export const ImageBackground = styled.div`
   min-height: 100%;
   position: absolute;

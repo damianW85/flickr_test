@@ -22,7 +22,12 @@ class FlickrComponent extends Component {
   addItems = (resp, update) => {
     let photosArray;
     update
-      ? (photosArray = [...this.state.photos, ...resp.data])
+      ? (photosArray = [
+          ...this.state.photos,
+          ...resp.data.filter(
+            o => !this.state.photos.find(o2 => o.photo.id === o2.photo.id)
+          )
+        ])
       : (photosArray = [...resp.data]);
 
     this.setState({
