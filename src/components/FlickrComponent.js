@@ -2,13 +2,21 @@ import React, { Component } from "react";
 import PostTemplate from "../templates/PostTemplate";
 import LabeledInput from "../partials/LabeledInput";
 import Button from "../partials/Button";
-import InfiniteScroll from "react-infinite-scroller";
 import PostImage from "../partials/PostImage";
-import { HeaderWrap } from "../partials/StyledElements";
+import { HeaderWrap, ScrollWrap } from "../partials/StyledElements";
+import { makeRequest } from "../partials/Methods";
+
+// FLICKR API CONFIG DATA \\
+
+const config = {
+  flickrApiKey: "932bc4e6e40774a53ef8e06a8b4b986d",
+  flickrApiSecret: "0a9034dc89d7f566"
+};
 
 class FlickrComponent extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       photos: [],
       nextPage: 1,
@@ -18,14 +26,14 @@ class FlickrComponent extends Component {
       keywords: ""
     };
   }
-
+  // UPDATE OR REPLACE PHOTOS IN STATE \\
   addItems = (resp, update) => {
     let photosArray;
     update
       ? (photosArray = [
           ...this.state.photos,
           ...resp.data.filter(
-            o => !this.state.photos.find(o2 => o.photo.id === o2.photo.id)
+            pik => !this.state.photos.find(pic => pik.photo.id === pic.photo.id)
           )
         ])
       : (photosArray = [...resp.data]);
@@ -37,37 +45,23 @@ class FlickrComponent extends Component {
       noMorePages: resp.nextPage < resp.totalPages
     });
   };
-
-  getItems = callBack => {
-    fetch(
-      `data?q=tags=${this.state.tags.map(tag => `${tag}`)}/page=${
-        this.state.nextPage
-      }`
-    )
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(data) {
-        callBack(data);
-      });
-  };
-
+  // UPDATE TAGS IN STATE,SEARCH FOR NEW TAGS AND STORE NEW PHTOS IN STATE \\
   searchNewTags = () => {
     this.setState(
       { tags: [...this.searchBox.value.split(" ")], nextPage: 1 },
       () => {
-        this.getItems(this.addItems, false);
+        this.getData(this.addItems, false);
         this.searchBox.value = "";
       }
     );
   };
-
+  // DELETE A PHOTO \\
   removePhoto = elementId => {
     this.setState({
       photos: [...this.state.photos.filter(post => post.photo.id !== elementId)]
     });
   };
-
+  // UPDATE KEYWORDS IN STATE, FILTER PHOTOS BY TITLE, USERNAME AND DESCRIPTION, BASED ON KEYWORDS \\
   filterPhotos = () => {
     this.setState(
       {
@@ -88,14 +82,46 @@ class FlickrComponent extends Component {
         ]
       },
       () =>
-        this.state.photos.length < 10
-          ? this.getItems(this.addItems, true)
-          : null
+        this.state.photos.length < 10 ? this.getData(this.addItems, true) : null
     );
   };
+  // CALL API, PASS IN SEARCH PARAMS AND CALLBACK TO HABDLE RESPONSE \\
+  getData(callBack) {
+    return makeRequest(
+      `https://api.flickr.com/services/rest?per_page=20&viewerNSID=&api_key=${
+        config.flickrApiKey
+      }&method=flickr.photos.search&tags=${this.state.tags.map(
+        tag => `${tag}`
+      )}&format=json&nojsoncallback=1&tagmode=any&page=${this.state.nextPage}`,
+      resp => {
+        let count = 0;
+        const responseObj = { data: [] };
+
+        responseObj.totalPages = resp.photos.pages;
+        responseObj.nextPage = resp.photos.page + 1;
+
+        resp.photos.photo.map(photo => {
+          return makeRequest(
+            `https://api.flickr.com/services/rest/?format=json&api_key=${
+              config.flickrApiKey
+            }&photo_id=${
+              photo.id
+            }&method=flickr.photos.getInfo&nojsoncallback=1`,
+            body => {
+              count++;
+              responseObj.data.push(body);
+              return count === resp.photos.photo.length - 1
+                ? callBack(responseObj)
+                : null;
+            }
+          );
+        });
+      }
+    );
+  }
 
   componentDidMount() {
-    this.getItems(this.addItems, false);
+    this.getData(this.addItems, false);
   }
 
   render() {
@@ -125,10 +151,10 @@ class FlickrComponent extends Component {
             label="Filter Photos"
           />
         </HeaderWrap>
-        <InfiniteScroll
+        <ScrollWrap
           className="scroll_wrapper"
           pageStart={0}
-          loadMore={() => this.getItems(data => this.addItems(data, true))}
+          loadMore={() => this.getData(data => this.addItems(data, true))}
           hasMore={this.state.noMorePages}
           threshold={300}
           loader={
@@ -139,14 +165,14 @@ class FlickrComponent extends Component {
             />
           }
         >
-          {this.state.photos.map((post, postIdx) => (
+          {this.state.photos.map(post => (
             <PostTemplate
               deletePost={this.removePhoto}
               key={post.photo.id}
               data={post.photo}
             />
           ))}
-        </InfiniteScroll>
+        </ScrollWrap>
       </div>
     ) : (
       <PostImage

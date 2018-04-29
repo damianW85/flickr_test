@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import InfiniteScroll from "react-infinite-scroller";
 
 export const HeaderWrap = styled.div`
   display: flex;
@@ -7,6 +8,22 @@ export const HeaderWrap = styled.div`
   @media only screen and (max-width: 800px) {
     flex-direction: column;
   }
+`;
+
+export const Link = styled.a`
+  text-decoration: none;
+  color: #00bcbc;
+  font-weight: normal;
+
+  &:hover {
+    color: #000;
+  }
+`;
+
+export const ScrollWrap = styled(InfiniteScroll)`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 `;
 
 export const InputWrap = styled.div`
@@ -61,6 +78,7 @@ export const StyledButton = styled.button`
   background-color: #a59466;
   color: #fff;
   padding: 0 25px;
+  margin: 0;
   border: 1px solid #a59466;
   text-align: center;
   cursor: pointer;
@@ -85,19 +103,12 @@ export const ImageWrap = styled.div`
   overflow: hidden;
 
   &.loader {
+    margin: 0 auto;
     min-width: 480px;
     width: 480px;
     height: 480px;
-    bottom: 0;
-    margin: 0 auto;
   }
 `;
-
-// const Component = styled.div.attrs({
-//     style: ({ background }) => ({
-//       background,
-//     }),
-//   })`width: 100%;`
 
 export const ImageBackground = styled.div`
   min-height: 100%;
@@ -112,18 +123,28 @@ export const ImageBackground = styled.div`
 `;
 
 export const PostWrapper = styled.div`
-  position: relative;
-  top: 0px;
-  left: 0px;
   padding: 15px;
   margin: 15px 0 0 15px;
   background-color: #004b64;
-  min-width: 400px;
-  flex: 1;
+  min-width: 350px;
+  max-width: 600px;
+  max-height: 800px;
+  float: left;
+  flex-grow: 1;
+  width: 30%;
 `;
 
 export const TagsWrapper = styled.div`
   width: 100%;
   padding: 15px 0;
   overflow: hidden;
+`;
+
+export const TextWrap = styled.p`
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 200px;
 `;

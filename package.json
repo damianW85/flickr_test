@@ -17,6 +17,7 @@
     "request-promise": "^4.2.2",
     "serve": "^6.5.6",
     "styled-components": "^3.1.6",
+    "stylis": "^3.5.0",
     "untildify": "^3.0.2"
   },
   "scripts": {

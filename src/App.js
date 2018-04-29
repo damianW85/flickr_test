@@ -40,6 +40,10 @@ injectGlobal`
 const AppWrapper = styled.div`
   font-family: BlueSkyStandard;
   width: 100%;
+  color: #ffffff;
+  font-weight: bold;
+  max-width: 2400px;
+  margin: 0 auto;
 `;
 
 class App extends Component {

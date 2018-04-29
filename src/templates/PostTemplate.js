@@ -1,16 +1,15 @@
 import React from "react";
 import PostImage from "../partials/PostImage";
+import { removeHTMLTags } from "../partials/Methods";
 import {
   PostWrapper,
   TagsWrapper,
-  StyledButton
+  StyledButton,
+  Link,
+  TextWrap
 } from "../partials/StyledElements";
 
 const PostTemplate = ({ data, deletePost }) => {
-  const description = data.description._content
-    .replace(/(<([^>]+)>)/gi, " ")
-    .trim();
-
   return (
     <PostWrapper>
       <StyledButton className="delete" onClick={() => deletePost(data.id)}>
@@ -22,21 +21,21 @@ const PostTemplate = ({ data, deletePost }) => {
         }_${data.secret}.jpg`}
       />
       <p>
-        <a
+        <Link
           target="_blank"
           href={`https://www.flickr.com/photos/${data.owner.nsid}/${data.id}`}
         >
           {data.title._content}
-        </a>{" "}
+        </Link>{" "}
         By:{" "}
-        <a
+        <Link
           target="_blank"
           href={`https://www.flickr.com/photos/${data.owner.nsid}`}
         >
           {data.owner.realname || data.owner.nsid}
-        </a>{" "}
+        </Link>{" "}
       </p>
-      <p>{description}</p>
+      <TextWrap>{removeHTMLTags(data.description._content)}</TextWrap>
       <TagsWrapper>
         {data.tags.tag.map(
           (tagObj, idx) =>
